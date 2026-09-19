@@ -37,6 +37,15 @@
       <span class="timer" id="timer-label"></span>
     </div>
     <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+    <div class="skill-meter">
+      <div class="skill-meter-label">
+        <span id="skill-topic"></span>
+        <span id="skill-count"></span>
+      </div>
+      <div class="progress-track"><div class="skill-fill" id="skill-fill" style="width:0%"></div></div>
+    </div>
+
     <div class="q-topic" id="q-topic"></div>
     <div class="q-text" id="q-text"></div>
     <div id="options"></div>
@@ -114,6 +123,11 @@
       `${((st.currentIndex) / st.picked.length) * 100}%`;
     document.getElementById("q-topic").textContent = `Day ${q.day} — ${q.topic}`;
     document.getElementById("q-text").textContent = q.question;
+
+    const correctSoFar = st.picked.filter((pq, i) => st.answers[i] === pq.correctDisplayIndex).length;
+    document.getElementById("skill-topic").textContent = `${q.topic} skill`;
+    document.getElementById("skill-count").textContent = `${correctSoFar} / ${st.picked.length} correct`;
+    document.getElementById("skill-fill").style.width = `${(correctSoFar / st.picked.length) * 100}%`;
 
     const answered = st.answers[st.currentIndex] !== null;
 

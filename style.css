@@ -77,6 +77,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .progress-track { background: #eee; border-radius: 6px; height: 8px; margin-bottom: 22px; overflow: hidden; }
 .progress-fill { background: var(--navy); height: 100%; transition: width 0.2s; }
 
+.skill-meter { margin-bottom: 4px; }
+.skill-meter-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.skill-meter-label span:first-child { font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.03em; }
+.skill-fill { background: var(--green); height: 100%; transition: width 0.2s; }
+
 .q-topic { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
 .q-text { font-size: 18px; font-weight: 600; margin-bottom: 18px; line-height: 1.4; }
 
