@@ -96,6 +96,9 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .option:hover { border-color: var(--navy); }
 .option.selected { border-color: var(--navy); background: #eaf0f6; color: var(--navy); font-weight: 600; }
+.option.correct { border-color: var(--green); background: #eaf7ea; color: var(--green); font-weight: 600; }
+.option.incorrect { border-color: var(--red); background: #fdecec; color: var(--red); font-weight: 600; }
+.option:disabled { cursor: default; opacity: 1; }
 
 .nav-row { display: flex; justify-content: space-between; margin-top: 18px; }
 
