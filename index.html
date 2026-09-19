@@ -62,6 +62,7 @@
     <div class="score-big" id="final-score"></div>
     <p class="muted" id="final-level"></p>
     <p class="muted">Your result has been recorded. Your supervisor will follow up with next steps.</p>
+    <button class="secondary" id="home-btn">Back to home</button>
   </div>
 
 </div>
@@ -144,6 +145,10 @@
     document.getElementById("next-btn").textContent =
       st.currentIndex === st.picked.length - 1 ? "Submit" : "Next";
   }
+
+  document.getElementById("home-btn").addEventListener("click", () => {
+    window.location.href = window.location.pathname;
+  });
 
   document.getElementById("prev-btn").addEventListener("click", () => { goPrev(); renderQuestion(); });
   document.getElementById("next-btn").addEventListener("click", () => {
