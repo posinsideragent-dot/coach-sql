@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SQL Account Support — Learn</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <div id="screen-day-pick" class="card">
+    <h1>SQL Account Support</h1>
+    <p class="subtitle">Learning</p>
+    <p class="muted">Pick the onboarding topic you want to learn. Each one is a short visual walkthrough, about 20 minutes.</p>
+    <div id="day-pick-options"></div>
+    <p class="muted" style="margin-top:20px;">Already studied? <a href="test.html">Go straight to testing</a>.</p>
+  </div>
+
+  <div id="screen-learn" class="card" style="display:none;">
+    <div class="top-bar">
+      <span id="learn-topic"></span>
+      <span class="timer" id="learn-timer"></span>
+    </div>
+    <div id="learn-content"></div>
+    <div class="nav-row">
+      <a class="secondary" id="home-btn" href="index.html" style="text-decoration:none;">Back to home</a>
+      <button id="learn-ready-btn">I'm ready — take the test</button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { renderDayPicker, startLearningModule } from "./js/learning.js";
+
+  renderDayPicker(document.getElementById("day-pick-options"), onDayPicked);
+
+  function onDayPicked(day) {
+    document.getElementById("screen-day-pick").style.display = "none";
+    document.getElementById("screen-learn").style.display = "block";
+    startLearningModule(day, {
+      topic: document.getElementById("learn-topic"),
+      timer: document.getElementById("learn-timer"),
+      content: document.getElementById("learn-content"),
+      readyBtn: document.getElementById("learn-ready-btn"),
+    }, () => {
+      window.location.href = `test.html?day=${day}`;
+    });
+  }
+</script>
+</body>
+</html>

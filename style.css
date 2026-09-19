@@ -126,12 +126,23 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: upp
 
 .pin-gate { max-width: 320px; margin: 80px auto; text-align: center; }
 
-#learn-content { max-height: 55vh; overflow-y: auto; padding-right: 4px; margin-bottom: 18px; }
+#learn-content { max-height: 65vh; overflow-y: auto; padding-right: 4px; margin-bottom: 18px; }
 .lesson-goal { font-size: 15px; margin: 0 0 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-.lesson { margin-bottom: 18px; }
-.lesson-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.lesson { margin-bottom: 26px; }
+.lesson-head { margin-bottom: 10px; }
 .lesson-title { font-weight: 700; color: var(--navy); font-size: 15px; }
-.lesson-mins { font-size: 12px; color: var(--muted); white-space: nowrap; margin-left: 10px; }
-ul.lesson-points { margin: 0; padding-left: 20px; }
-ul.lesson-points li { font-size: 14px; margin-bottom: 6px; line-height: 1.4; }
 .practice-task { font-size: 15px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--border); }
+
+.demo-steps { display: flex; flex-direction: column; gap: 14px; }
+.demo-step { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fafbfc; }
+.demo-step img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--border); }
+.demo-caption { margin: 0; padding: 10px 12px; font-size: 13px; line-height: 1.4; color: var(--text); }
+
+.home-choices { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+.home-choice {
+  display: block; padding: 18px 20px; border: 1.5px solid var(--border); border-radius: 10px;
+  text-decoration: none; color: var(--text); transition: border-color 0.15s;
+}
+.home-choice:hover { border-color: var(--navy); }
+.home-choice-title { font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.home-choice-desc { font-size: 14px; color: var(--muted); }

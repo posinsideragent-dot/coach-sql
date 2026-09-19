@@ -1,5 +1,5 @@
 import { DAY_NAMES } from "./quiz.js";
-import { TUTORIALS } from "./tutorials.js";
+import { DEMO_STEPS } from "./demo-steps.js";
 import { LEARNING_MODULE_MINUTES } from "../firebase-config.js";
 
 let timerInterval = null;
@@ -15,45 +15,56 @@ export function renderDayPicker(container, onPick) {
   });
 }
 
-function renderTutorialContent(container, tutorial) {
+function renderDemoContent(container, demo) {
   container.innerHTML = "";
 
   const goal = document.createElement("p");
   goal.className = "lesson-goal";
-  goal.innerHTML = `<strong>Goal:</strong> ${tutorial.goal}`;
+  goal.innerHTML = `<strong>Goal:</strong> ${demo.goal}`;
   container.appendChild(goal);
 
-  tutorial.lessons.forEach((lesson) => {
+  demo.lessons.forEach((lesson) => {
     const block = document.createElement("div");
     block.className = "lesson";
 
     const head = document.createElement("div");
     head.className = "lesson-head";
-    head.innerHTML = `<span class="lesson-title">${lesson.title}</span><span class="lesson-mins">~${lesson.minutes} min</span>`;
+    head.innerHTML = `<span class="lesson-title">${lesson.title}</span>`;
     block.appendChild(head);
 
-    const list = document.createElement("ul");
-    list.className = "lesson-points";
-    lesson.points.forEach((point) => {
-      const li = document.createElement("li");
-      li.textContent = point;
-      list.appendChild(li);
+    const stepsWrap = document.createElement("div");
+    stepsWrap.className = "demo-steps";
+    lesson.steps.forEach((step, i) => {
+      const stepEl = document.createElement("div");
+      stepEl.className = "demo-step";
+      if (step.image) {
+        const img = document.createElement("img");
+        img.src = step.image;
+        img.alt = step.caption || `${lesson.title} — step ${i + 1}`;
+        img.loading = "lazy";
+        stepEl.appendChild(img);
+      }
+      const cap = document.createElement("p");
+      cap.className = "demo-caption";
+      cap.textContent = `${i + 1}. ${step.caption}`;
+      stepEl.appendChild(cap);
+      stepsWrap.appendChild(stepEl);
     });
-    block.appendChild(list);
+    block.appendChild(stepsWrap);
 
     container.appendChild(block);
   });
 
   const task = document.createElement("p");
   task.className = "practice-task";
-  task.innerHTML = `<strong>You'll practice:</strong> ${tutorial.practiceTask}`;
+  task.innerHTML = `<strong>You'll practice:</strong> ${demo.practiceTask}`;
   container.appendChild(task);
 }
 
 export function startLearningModule(day, els, onDone) {
-  const tutorial = TUTORIALS[day];
-  els.topic.textContent = `Day ${day} — ${tutorial.topic}`;
-  renderTutorialContent(els.content, tutorial);
+  const demo = DEMO_STEPS[day];
+  els.topic.textContent = `Day ${day} — ${demo.topic}`;
+  renderDemoContent(els.content, demo);
 
   let done = false;
   const finishOnce = () => {
