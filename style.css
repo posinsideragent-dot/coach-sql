@@ -136,7 +136,9 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: upp
 .demo-steps { display: flex; flex-direction: column; gap: 14px; }
 .demo-step { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fafbfc; }
 .demo-step img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--border); }
-.demo-caption { margin: 0; padding: 10px 12px; font-size: 13px; line-height: 1.4; color: var(--text); }
+.demo-caption-wrap { padding: 10px 12px; }
+.demo-caption { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--text); }
+.demo-explanation { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
 
 .home-choices { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
 .home-choice {

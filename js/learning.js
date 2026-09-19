@@ -44,10 +44,19 @@ function renderDemoContent(container, demo) {
         img.loading = "lazy";
         stepEl.appendChild(img);
       }
+      const capWrap = document.createElement("div");
+      capWrap.className = "demo-caption-wrap";
       const cap = document.createElement("p");
       cap.className = "demo-caption";
       cap.textContent = `${i + 1}. ${step.caption}`;
-      stepEl.appendChild(cap);
+      capWrap.appendChild(cap);
+      if (step.explanation) {
+        const exp = document.createElement("p");
+        exp.className = "demo-explanation";
+        exp.textContent = step.explanation;
+        capWrap.appendChild(exp);
+      }
+      stepEl.appendChild(capWrap);
       stepsWrap.appendChild(stepEl);
     });
     block.appendChild(stepsWrap);
