@@ -16,10 +16,6 @@ export const DAY_NAMES = {
 
 let state = null; // { candidateId, name, day, picked, currentIndex, answers, timerEnd, flagsBuffer }
 
-export function getQuestionsForDay(day) {
-  return QUESTIONS.filter((q) => q.day === day).map((q) => ({ topic: q.topic, why: q.why }));
-}
-
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {

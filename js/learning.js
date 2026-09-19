@@ -1,4 +1,5 @@
-import { DAY_NAMES, getQuestionsForDay } from "./quiz.js";
+import { DAY_NAMES } from "./quiz.js";
+import { TUTORIALS } from "./tutorials.js";
 import { LEARNING_MODULE_MINUTES } from "../firebase-config.js";
 
 let timerInterval = null;
@@ -14,16 +15,45 @@ export function renderDayPicker(container, onPick) {
   });
 }
 
-export function startLearningModule(day, els, onDone) {
-  const topic = DAY_NAMES[day];
-  els.topic.textContent = `Day ${day} — ${topic}`;
+function renderTutorialContent(container, tutorial) {
+  container.innerHTML = "";
 
-  els.content.innerHTML = "";
-  getQuestionsForDay(day).forEach((entry) => {
-    const p = document.createElement("p");
-    p.textContent = entry.why;
-    els.content.appendChild(p);
+  const goal = document.createElement("p");
+  goal.className = "lesson-goal";
+  goal.innerHTML = `<strong>Goal:</strong> ${tutorial.goal}`;
+  container.appendChild(goal);
+
+  tutorial.lessons.forEach((lesson) => {
+    const block = document.createElement("div");
+    block.className = "lesson";
+
+    const head = document.createElement("div");
+    head.className = "lesson-head";
+    head.innerHTML = `<span class="lesson-title">${lesson.title}</span><span class="lesson-mins">~${lesson.minutes} min</span>`;
+    block.appendChild(head);
+
+    const list = document.createElement("ul");
+    list.className = "lesson-points";
+    lesson.points.forEach((point) => {
+      const li = document.createElement("li");
+      li.textContent = point;
+      list.appendChild(li);
+    });
+    block.appendChild(list);
+
+    container.appendChild(block);
   });
+
+  const task = document.createElement("p");
+  task.className = "practice-task";
+  task.innerHTML = `<strong>You'll practice:</strong> ${tutorial.practiceTask}`;
+  container.appendChild(task);
+}
+
+export function startLearningModule(day, els, onDone) {
+  const tutorial = TUTORIALS[day];
+  els.topic.textContent = `Day ${day} — ${tutorial.topic}`;
+  renderTutorialContent(els.content, tutorial);
 
   let done = false;
   const finishOnce = () => {

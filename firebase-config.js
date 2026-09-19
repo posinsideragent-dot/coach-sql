@@ -25,14 +25,16 @@ export const ADMIN_PIN = "2468";
 // How many questions to serve per attempt, picked randomly from the chosen
 // onboarding day's bank only (the candidate picks their day before testing —
 // see the learning module step — so every attempt is scoped to one day).
-export const QUESTIONS_PER_DAY = 5;
+export const QUESTIONS_PER_DAY = 20;
 export const TIME_LIMIT_MINUTES = 50;
-export const POINTS_PER_QUESTION = 4; // 5 questions x 4 = 20 points per attempt
+export const POINTS_PER_QUESTION = 4; // 20 questions x 4 = 80 points per attempt
 
-// How long the candidate gets to review that day's topic before the timed
-// quiz starts. Kept short on purpose — it's a refresher, not a study period,
-// and shouldn't eat into the time budget of the exam itself.
-export const LEARNING_MODULE_MINUTES = 6;
+// How long the candidate gets to work through that day's tutorial (real
+// lesson content pulled from the SQL Account knowledge base, see
+// js/tutorials.js) before the timed quiz starts. Each day's lessons add up
+// to roughly 30-40 minutes of reading; 40 gives comfortable headroom. An
+// "I'm ready" button lets a candidate move on early if they finish sooner.
+export const LEARNING_MODULE_MINUTES = 40;
 
 // Fill these in after creating a free account at https://www.emailjs.com/ —
 // add an Email Service (e.g. connect Gmail) and an Email Template there, then

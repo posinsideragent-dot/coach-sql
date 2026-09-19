@@ -1,21 +1,25 @@
 # coach-sql — SQL Account Support Hard Mode Assessment
 
-A standalone, no-login quiz app for the 50-question hard-mode SQL Account
-Support theory test. Plain HTML/JS, hosted free on GitHub Pages, with a
-live Firestore database so the admin dashboard updates in real time as
-candidates test. No Claude Artifact involved — this runs entirely as your
-own site.
+A standalone, no-login learn-then-test app for SQL Account Support onboarding.
+Plain HTML/JS, hosted free on GitHub Pages, with a live Firestore database so
+the admin dashboard updates in real time as candidates progress. No Claude
+Artifact involved — this runs entirely as your own site.
 
-The candidate picks which onboarding day they're being tested on, gets a
-short timed review of that day's topic, then takes a 5-question quiz drawn
-from that day's bank only — reshuffling both question order and option
-order, and auto-scoring per attempt. Scoring is turned into a level
-(Advanced / Intermediate / Junior / Beginner, by percentage) the moment they
-finish, and a marking-sheet email with their name, score, day, and level is
-sent automatically. Meant to run inside SEB (Safe Exam Browser) as the
-lockdown layer, the same way your existing SQL Account Academy LMS does —
-this app's own in-page tab-switch/fullscreen/copy-paste logging is a second
-layer on top of that, not a replacement for it.
+The candidate picks which onboarding day they're being tested on, works
+through a real tutorial for that topic (real lesson content pulled from the
+SQL Account knowledge base — see `js/tutorials.js` — not just quiz-answer
+snippets, budgeted at roughly 30-40 minutes of reading), then takes a
+20-question quiz drawn from that day's 20-question bank (100 questions
+total, 20 per onboarding day, in `js/questions.js`) — reshuffling both
+question order and option order, and auto-scoring per attempt. Both the
+tutorial and the quiz comfortably fit inside a single 9am-6pm working day,
+with plenty of time left over for real hands-on practice in the software.
+Scoring is turned into a level (Advanced / Intermediate / Junior / Beginner,
+by percentage) the moment they finish, and a marking-sheet email with their
+name, score, day, and level is sent automatically. Meant to run inside SEB
+(Safe Exam Browser) as the lockdown layer, the same way your existing SQL
+Account Academy LMS does — this app's own in-page tab-switch/fullscreen/
+copy-paste logging is a second layer on top of that, not a replacement for it.
 
 ## 1. Firebase setup (you said you already have a project)
 
