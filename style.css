@@ -126,19 +126,21 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: upp
 
 .pin-gate { max-width: 320px; margin: 80px auto; text-align: center; }
 
-#learn-content { max-height: 65vh; overflow-y: auto; padding-right: 4px; margin-bottom: 18px; }
-.lesson-goal { font-size: 15px; margin: 0 0 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-.lesson { margin-bottom: 26px; }
-.lesson-head { margin-bottom: 10px; }
-.lesson-title { font-weight: 700; color: var(--navy); font-size: 15px; }
-.practice-task { font-size: 15px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--border); }
+.step-label { text-align: center; font-size: 12px; color: var(--muted); margin: 8px 0 16px; font-variant-numeric: tabular-nums; }
+#learn-content { min-height: 320px; margin-bottom: 16px; }
+.lesson-goal { font-size: 16px; margin: 0; }
+.practice-task { font-size: 16px; margin: 0; }
+.lesson-title { font-weight: 700; color: var(--navy); font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; }
 
-.demo-steps { display: flex; flex-direction: column; gap: 14px; }
 .demo-step { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fafbfc; }
 .demo-step img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--border); }
-.demo-caption-wrap { padding: 10px 12px; }
-.demo-caption { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--text); }
-.demo-explanation { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.demo-caption-wrap { padding: 12px 14px; }
+.demo-caption { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--text); }
+.why-toggle {
+  background: none; color: var(--navy); font-weight: 600; font-size: 13px;
+  padding: 8px 0 0; text-align: left;
+}
+.demo-explanation { margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
 
 .home-choices { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
 .home-choice {

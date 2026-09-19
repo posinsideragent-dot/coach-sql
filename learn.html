@@ -22,10 +22,16 @@
       <span id="learn-topic"></span>
       <span class="timer" id="learn-timer"></span>
     </div>
+    <div class="progress-track"><div class="progress-fill" id="learn-progress-fill" style="width:0%"></div></div>
+    <div id="learn-step-label" class="step-label"></div>
     <div id="learn-content"></div>
     <div class="nav-row">
+      <button class="secondary" id="learn-prev-btn">Back</button>
+      <button id="learn-next-btn">Next</button>
+    </div>
+    <div class="nav-row" style="margin-top:10px;">
       <a class="secondary" id="home-btn" href="index.html" style="text-decoration:none;">Back to home</a>
-      <button id="learn-ready-btn">I'm ready — take the test</button>
+      <button class="secondary" id="learn-ready-btn">Skip to the test</button>
     </div>
   </div>
 
@@ -43,6 +49,10 @@
       topic: document.getElementById("learn-topic"),
       timer: document.getElementById("learn-timer"),
       content: document.getElementById("learn-content"),
+      stepLabel: document.getElementById("learn-step-label"),
+      progressFill: document.getElementById("learn-progress-fill"),
+      prevBtn: document.getElementById("learn-prev-btn"),
+      nextBtn: document.getElementById("learn-next-btn"),
       readyBtn: document.getElementById("learn-ready-btn"),
     }, () => {
       window.location.href = `test.html?day=${day}`;

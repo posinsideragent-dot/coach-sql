@@ -15,73 +15,114 @@ export function renderDayPicker(container, onPick) {
   });
 }
 
-function renderDemoContent(container, demo) {
+// Flattens a day's demo into one ordered sequence of cards: an intro card
+// (goal), one card per screenshot step (tagged with its lesson title), and
+// a closing card (practice task) — so the candidate only ever sees one
+// thing at a time instead of a long scrolling page.
+function buildSequence(demo) {
+  const sequence = [{ kind: "goal", text: demo.goal }];
+  demo.lessons.forEach((lesson) => {
+    lesson.steps.forEach((step) => {
+      sequence.push({ kind: "step", lessonTitle: lesson.title, ...step });
+    });
+  });
+  sequence.push({ kind: "practice", text: demo.practiceTask });
+  return sequence;
+}
+
+function renderCard(container, card) {
   container.innerHTML = "";
 
-  const goal = document.createElement("p");
-  goal.className = "lesson-goal";
-  goal.innerHTML = `<strong>Goal:</strong> ${demo.goal}`;
-  container.appendChild(goal);
+  if (card.kind === "goal") {
+    const p = document.createElement("p");
+    p.className = "lesson-goal";
+    p.innerHTML = `<strong>Goal:</strong> ${card.text}`;
+    container.appendChild(p);
+    return;
+  }
 
-  demo.lessons.forEach((lesson) => {
-    const block = document.createElement("div");
-    block.className = "lesson";
+  if (card.kind === "practice") {
+    const p = document.createElement("p");
+    p.className = "practice-task";
+    p.innerHTML = `<strong>You'll practice:</strong> ${card.text}`;
+    container.appendChild(p);
+    return;
+  }
 
-    const head = document.createElement("div");
-    head.className = "lesson-head";
-    head.innerHTML = `<span class="lesson-title">${lesson.title}</span>`;
-    block.appendChild(head);
+  const title = document.createElement("div");
+  title.className = "lesson-title";
+  title.textContent = card.lessonTitle;
+  container.appendChild(title);
 
-    const stepsWrap = document.createElement("div");
-    stepsWrap.className = "demo-steps";
-    lesson.steps.forEach((step, i) => {
-      const stepEl = document.createElement("div");
-      stepEl.className = "demo-step";
-      if (step.image) {
-        const img = document.createElement("img");
-        img.src = step.image;
-        img.alt = step.caption || `${lesson.title} — step ${i + 1}`;
-        img.loading = "lazy";
-        stepEl.appendChild(img);
-      }
-      const capWrap = document.createElement("div");
-      capWrap.className = "demo-caption-wrap";
-      const cap = document.createElement("p");
-      cap.className = "demo-caption";
-      cap.textContent = `${i + 1}. ${step.caption}`;
-      capWrap.appendChild(cap);
-      if (step.explanation) {
-        const exp = document.createElement("p");
-        exp.className = "demo-explanation";
-        exp.textContent = step.explanation;
-        capWrap.appendChild(exp);
-      }
-      stepEl.appendChild(capWrap);
-      stepsWrap.appendChild(stepEl);
+  const stepEl = document.createElement("div");
+  stepEl.className = "demo-step";
+  if (card.image) {
+    const img = document.createElement("img");
+    img.src = card.image;
+    img.alt = card.caption || card.lessonTitle;
+    stepEl.appendChild(img);
+  }
+
+  const capWrap = document.createElement("div");
+  capWrap.className = "demo-caption-wrap";
+  const cap = document.createElement("p");
+  cap.className = "demo-caption";
+  cap.textContent = card.caption;
+  capWrap.appendChild(cap);
+
+  if (card.explanation) {
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "why-toggle";
+    toggle.textContent = "Why it matters ▾";
+    const exp = document.createElement("p");
+    exp.className = "demo-explanation";
+    exp.textContent = card.explanation;
+    exp.hidden = true;
+    toggle.addEventListener("click", () => {
+      exp.hidden = !exp.hidden;
+      toggle.textContent = exp.hidden ? "Why it matters ▾" : "Why it matters ▴";
     });
-    block.appendChild(stepsWrap);
+    capWrap.appendChild(toggle);
+    capWrap.appendChild(exp);
+  }
 
-    container.appendChild(block);
-  });
-
-  const task = document.createElement("p");
-  task.className = "practice-task";
-  task.innerHTML = `<strong>You'll practice:</strong> ${demo.practiceTask}`;
-  container.appendChild(task);
+  stepEl.appendChild(capWrap);
+  container.appendChild(stepEl);
 }
 
 export function startLearningModule(day, els, onDone) {
   const demo = DEMO_STEPS[day];
   els.topic.textContent = `Day ${day} — ${demo.topic}`;
-  renderDemoContent(els.content, demo);
+
+  const sequence = buildSequence(demo);
+  let index = 0;
+
+  function renderCurrent() {
+    renderCard(els.content, sequence[index]);
+    els.stepLabel.textContent = `${index + 1} / ${sequence.length}`;
+    els.progressFill.style.width = `${(index / (sequence.length - 1)) * 100}%`;
+    els.prevBtn.style.visibility = index === 0 ? "hidden" : "visible";
+    els.nextBtn.textContent = index === sequence.length - 1 ? "Done" : "Next";
+  }
+
+  els.prevBtn.onclick = () => {
+    if (index > 0) { index -= 1; renderCurrent(); }
+  };
+  els.nextBtn.onclick = () => {
+    if (index < sequence.length - 1) { index += 1; renderCurrent(); }
+    else finishOnce();
+  };
+
+  renderCurrent();
 
   let done = false;
-  const finishOnce = () => {
+  function finishOnce() {
     if (done) return;
     done = true;
     clearInterval(timerInterval);
     onDone();
-  };
+  }
 
   els.readyBtn.onclick = finishOnce;
 
