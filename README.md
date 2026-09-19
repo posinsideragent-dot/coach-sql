@@ -1,1 +1,85 @@
-# coach-sql
+# coach-sql — SQL Account Support Hard Mode Assessment
+
+A standalone, no-login quiz app for the 50-question hard-mode SQL Account
+Support theory test. Plain HTML/JS, hosted free on GitHub Pages, with a
+live Firestore database so the admin dashboard updates in real time as
+candidates test. No Claude Artifact involved — this runs entirely as your
+own site.
+
+Each attempt pulls 5 random questions from each of the 5 onboarding days
+(25 total, out of the 50-question bank), reshuffles both question order and
+option order, and auto-scores out of 100. Meant to run inside SEB (Safe
+Exam Browser) as the lockdown layer, the same way your existing SQL Account
+Academy LMS does — this app's own in-page tab-switch/fullscreen/copy-paste
+logging is a second layer on top of that, not a replacement for it.
+
+## 1. Firebase setup (you said you already have a project)
+
+1. Go to your Firebase project → **Build → Firestore Database** → if you
+   haven't already, click **Create database** (choose "production mode",
+   any region close to your users).
+2. Go to **Firestore Database → Rules**, and paste in the contents of
+   `firestore.rules` from this repo, then **Publish**.
+3. Go to **Project settings** (gear icon) → **General** → scroll to
+   **Your apps**. If you don't have a Web app yet, click the `</>` icon to
+   add one (any nickname, no hosting needed). Copy the `firebaseConfig`
+   object it shows you.
+4. In this project folder, copy `firebase-config.example.js` to
+   `firebase-config.js`, and paste your real values in. This file is safe
+   to commit — Firebase config isn't a secret, your Firestore Rules are
+   what actually protects the data.
+5. While you're in that file, you can also change `ADMIN_PIN`,
+   `QUESTIONS_PER_DAY`, `TIME_LIMIT_MINUTES`, and `POINTS_PER_QUESTION` if
+   you want different defaults than 25 questions / 50 minutes / 100 points.
+
+## 2. Push to GitHub
+
+From inside this folder:
+
+```bash
+git init
+git add .
+git commit -m "Initial coach-sql hard mode assessment"
+git branch -M main
+git remote add origin https://github.com/posinsideragent-dot/coach-sql.git
+git push -u origin main
+```
+
+(If the repo already has a commit in it from being created with a README on
+GitHub's side, run `git pull origin main --allow-unrelated-histories` before
+the push, and resolve any conflict on `README.md` by keeping this one.)
+
+## 3. Turn on GitHub Pages
+
+1. On GitHub, open the repo → **Settings → Pages**.
+2. Under **Build and deployment → Source**, choose **Deploy from a branch**.
+3. Branch: `main`, folder: `/ (root)`. Save.
+4. GitHub will give you a URL like
+   `https://posinsideragent-dot.github.io/coach-sql/` — that's the
+   candidate link (`index.html`) and the admin link is the same with
+   `/admin.html` on the end.
+
+## 4. Wire it into SEB
+
+Point your existing `.seb` config's Start URL at the GitHub Pages
+candidate link instead of the old LMS artifact link — everything else in
+your SEB setup (Prohibited Processes list, quit password) carries over
+unchanged. See `seb-lockdown-guide.md` / `seb-lockdown-guide-sql-account-academy.md`
+in your project notes for the full SEB steps if you need a refresher.
+
+## Known limitations (read before using with real hires)
+
+- **No real backend.** All scoring happens in the candidate's own browser,
+  and the correct answers are present in this app's JS source. A candidate
+  who opens browser devtools and reads the code could find the answers.
+  This is the same category of limitation your plan.md already calls out
+  for browser-based proctoring generally — SEB blocking devtools/other apps
+  at the OS level is what actually closes this gap, not this app by itself.
+- **Firestore rules are wide open** (anyone with the site can read every
+  candidate's data, not just their own). This matches the same "deterrent,
+  not real security" level as your existing LMS's admin PIN. Locking this
+  down properly needs Firebase Authentication, which is a bigger change —
+  say the word if you want that built next.
+- **Tab-switch detection can't catch everything** — a second physical
+  device (a phone) next to the candidate is invisible to this app or to
+  SEB. Same limitation your plan.md already documents for the other LMS.

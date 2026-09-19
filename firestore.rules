@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Candidates collection: anyone with the site link can create their own
+    // attempt document and update it (this is how a candidate with no login
+    // writes their own progress/answers/flags). Anyone can also READ the
+    // whole collection, because the admin dashboard needs a live view and
+    // this app has no real authentication layer (same accepted trade-off as
+    // the placeholder admin PIN in firebase-config.js — it's a deterrent,
+    // not real security).
+    //
+    // If you later want this locked down properly, the fix is Firebase
+    // Authentication (e.g. anonymous auth for candidates, email/password or
+    // Google sign-in for the admin) plus rules that check request.auth —
+    // a bigger change than this quiz app currently needs.
+    match /candidates/{candidateId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if false;
+    }
+  }
+}
