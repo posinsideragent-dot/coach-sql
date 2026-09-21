@@ -54,4 +54,4 @@ export const MARKING_EMAIL_TO = "posinsideragent@gmail.com";
 // completed_at) — no PDF/file attachment, since that needs either EmailJS's
 // paid plan or Firebase's paid Blaze plan for Storage, neither of which
 // this app uses.
-export const EMAILJS_COMPLETION_TEMPLATE_ID = "PASTE_AFTER_CREATING_TEMPLATE";
+export const EMAILJS_COMPLETION_TEMPLATE_ID = "template_69jr97q";
