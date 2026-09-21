@@ -48,6 +48,10 @@ export const EMAILJS_PUBLIC_KEY = "qEx9SNi8cHxY8jjxg";
 export const MARKING_EMAIL_TO = "posinsideragent@gmail.com";
 
 // A SECOND EmailJS template, for the one-time "candidate passed all 5 days"
-// completion report — different merge fields than the per-attempt marking
-// email above (candidate_name, candidate_email, pdf_url, completed_at).
+// completion report — the full report goes directly in the email body as
+// plain fields (candidate_name, candidate_email, day1_topic/score/level
+// through day5_..., overall_score, overall_level, ready_to_work,
+// completed_at) — no PDF/file attachment, since that needs either EmailJS's
+// paid plan or Firebase's paid Blaze plan for Storage, neither of which
+// this app uses.
 export const EMAILJS_COMPLETION_TEMPLATE_ID = "PASTE_AFTER_CREATING_TEMPLATE";
