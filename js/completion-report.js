@@ -27,25 +27,29 @@ export async function maybeSendCompletionReport(profile) {
     const overallLevel = computeLevel(totalScore, totalMax);
     const overallPercent = totalMax > 0 ? (totalScore / totalMax) * 100 : 0;
 
+    if (!window.emailjs) {
+      console.warn("EmailJS SDK not loaded — completion report not sent.");
+      return;
+    }
+
+    window.emailjs.init(EMAILJS_PUBLIC_KEY);
+    await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_COMPLETION_TEMPLATE_ID, {
+      to_email: MARKING_EMAIL_TO,
+      candidate_name: profile.name,
+      candidate_email: profile.email,
+      ...dayFields,
+      overall_score: `${totalScore} / ${totalMax} (${overallPercent.toFixed(1)}%)`,
+      overall_level: overallLevel,
+      ready_to_work: "YES",
+      completed_at: new Date().toLocaleString(),
+    });
+
+    // Only mark as sent once the email actually succeeded — marking it
+    // beforehand would permanently block retrying after a failed send,
+    // since this function's whole guard is "skip if already sent".
     await updateDoc(doc(db, "candidate_profiles", profile.email), {
       reportSentAt: serverTimestamp(),
     });
-
-    if (window.emailjs) {
-      window.emailjs.init(EMAILJS_PUBLIC_KEY);
-      await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_COMPLETION_TEMPLATE_ID, {
-        to_email: MARKING_EMAIL_TO,
-        candidate_name: profile.name,
-        candidate_email: profile.email,
-        ...dayFields,
-        overall_score: `${totalScore} / ${totalMax} (${overallPercent.toFixed(1)}%)`,
-        overall_level: overallLevel,
-        ready_to_work: "YES",
-        completed_at: new Date().toLocaleString(),
-      });
-    } else {
-      console.warn("EmailJS SDK not loaded — completion report not sent.");
-    }
   } catch (e) {
     console.error("completion report failed", e);
   }
