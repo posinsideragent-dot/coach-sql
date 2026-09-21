@@ -12,12 +12,17 @@ import {
   serverTimestamp, arrayUnion, getDoc, getDocs, addDoc, deleteDoc,
   query, where, writeBatch,
 } from "../vendor/firebase/firebase-firestore.js";
+import {
+  getStorage, ref, uploadBytes, getDownloadURL,
+} from "../vendor/firebase/firebase-storage.js";
 import { firebaseConfig } from "../firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 export {
   collection, doc, setDoc, updateDoc, onSnapshot, serverTimestamp, arrayUnion, getDoc,
   getDocs, addDoc, deleteDoc, query, where, writeBatch,
+  ref, uploadBytes, getDownloadURL,
 };

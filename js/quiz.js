@@ -65,13 +65,14 @@ async function pushFlag(flag) {
   }
 }
 
-export async function startAttempt(name, day) {
+export async function startAttempt(name, email, day) {
   const candidateId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const picked = await pickQuestionsForAttempt(day);
 
   state = {
     candidateId,
     name,
+    email,
     day,
     picked,
     currentIndex: 0,
@@ -82,6 +83,7 @@ export async function startAttempt(name, day) {
 
   await setDoc(doc(db, "candidates", candidateId), {
     name,
+    email,
     day,
     status: "in-progress",
     startedAt: serverTimestamp(),
@@ -172,6 +174,7 @@ export async function submitAttempt() {
     maxScore,
     scoreByDay,
     name: state.name,
+    email: state.email,
     day: state.day,
     answers: answerDetail,
     flagsCount: state.flagsBuffer.length,

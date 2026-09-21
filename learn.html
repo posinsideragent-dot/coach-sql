@@ -13,8 +13,9 @@
   <div id="screen-name" class="card">
     <h1>SQL Account Support</h1>
     <p class="subtitle">Learning</p>
-    <p class="muted">Type your name so your progress shows up for your supervisor, then pick a topic to learn — about 20 minutes each.</p>
+    <p class="muted">Type your name and email so your progress shows up for your supervisor, then pick a topic to learn — about 20 minutes each. Day 2 onward unlocks once you've passed the test for the day before it.</p>
     <input id="name-input" type="text" placeholder="Type your full name" />
+    <input id="email-input" type="email" placeholder="Type your email" />
     <button id="start-btn">Continue</button>
   </div>
 
@@ -47,22 +48,29 @@
 
 <script type="module">
   import { renderDayPicker, startLearningModule } from "./js/learning.js";
+  import { getCandidateProfile, unlockedDaysFromProfile } from "./js/candidate-progress.js";
 
   let candidateName = "";
+  let candidateEmail = "";
 
-  document.getElementById("start-btn").addEventListener("click", () => {
+  document.getElementById("start-btn").addEventListener("click", async () => {
     const name = document.getElementById("name-input").value.trim();
-    if (!name) { alert("Please type your name first."); return; }
+    const email = document.getElementById("email-input").value.trim().toLowerCase();
+    if (!name || !email) { alert("Please type your name and email first."); return; }
     candidateName = name;
+    candidateEmail = email;
     document.getElementById("screen-name").style.display = "none";
     document.getElementById("screen-day-pick").style.display = "block";
-    renderDayPicker(document.getElementById("day-pick-options"), onDayPicked);
+    document.getElementById("day-pick-options").innerHTML = "<p class=\"muted\">Loading your progress…</p>";
+    const profile = await getCandidateProfile(candidateEmail);
+    const unlockedDays = unlockedDaysFromProfile(profile);
+    renderDayPicker(document.getElementById("day-pick-options"), onDayPicked, unlockedDays);
   });
 
   function onDayPicked(day) {
     document.getElementById("screen-day-pick").style.display = "none";
     document.getElementById("screen-learn").style.display = "block";
-    startLearningModule(candidateName, day, {
+    startLearningModule(candidateName, candidateEmail, day, {
       topic: document.getElementById("learn-topic"),
       timer: document.getElementById("learn-timer"),
       content: document.getElementById("learn-content"),
@@ -72,7 +80,7 @@
       nextBtn: document.getElementById("learn-next-btn"),
       readyBtn: document.getElementById("learn-ready-btn"),
     }, () => {
-      window.location.href = `test.html?day=${day}`;
+      window.location.href = `test.html?day=${day}&email=${encodeURIComponent(candidateEmail)}`;
     });
   }
 </script>

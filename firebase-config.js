@@ -46,3 +46,8 @@ export const EMAILJS_SERVICE_ID = "service_4pvav1n";
 export const EMAILJS_TEMPLATE_ID = "template_rnd3knr";
 export const EMAILJS_PUBLIC_KEY = "qEx9SNi8cHxY8jjxg";
 export const MARKING_EMAIL_TO = "posinsideragent@gmail.com";
+
+// A SECOND EmailJS template, for the one-time "candidate passed all 5 days"
+// completion report — different merge fields than the per-attempt marking
+// email above (candidate_name, candidate_email, pdf_url, completed_at).
+export const EMAILJS_COMPLETION_TEMPLATE_ID = "PASTE_AFTER_CREATING_TEMPLATE";

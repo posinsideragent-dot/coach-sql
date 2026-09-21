@@ -5,13 +5,24 @@ import { db, doc, setDoc, updateDoc, serverTimestamp } from "./firebase-init.js"
 
 let timerInterval = null;
 
-export function renderDayPicker(container, onPick) {
+// unlockedDays: optional Set/array of day numbers that are clickable. If
+// omitted, every day is clickable (used before candidate identity existed).
+export function renderDayPicker(container, onPick, unlockedDays) {
   container.innerHTML = "";
+  const unlocked = unlockedDays ? new Set(unlockedDays) : null;
   Object.keys(DAY_NAMES).sort((a, b) => a - b).forEach((day) => {
+    const dayNum = Number(day);
+    const isLocked = unlocked && !unlocked.has(dayNum);
     const btn = document.createElement("button");
     btn.className = "option";
-    btn.textContent = `Day ${day} — ${DAY_NAMES[day]}`;
-    btn.addEventListener("click", () => onPick(Number(day)));
+    btn.textContent = isLocked
+      ? `🔒 Day ${day} — ${DAY_NAMES[day]} (pass Day ${dayNum - 1} first)`
+      : `Day ${day} — ${DAY_NAMES[day]}`;
+    if (isLocked) {
+      btn.disabled = true;
+    } else {
+      btn.addEventListener("click", () => onPick(dayNum));
+    }
     container.appendChild(btn);
   });
 }
@@ -104,7 +115,7 @@ async function pushLearningUpdate(sessionId, fields) {
   }
 }
 
-export function startLearningModule(name, day, els, onDone) {
+export function startLearningModule(name, email, day, els, onDone) {
   const demo = DEMO_STEPS[day];
   els.topic.textContent = `Day ${day} — ${demo.topic}`;
 
@@ -114,6 +125,7 @@ export function startLearningModule(name, day, els, onDone) {
 
   setDoc(doc(db, "learning_sessions", sessionId), {
     name,
+    email,
     day,
     topic: demo.topic,
     status: "in-progress",
