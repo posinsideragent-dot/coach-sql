@@ -98,6 +98,7 @@
   async function beginQuiz(day) {
     document.getElementById("screen-day-pick").style.display = "none";
     document.getElementById("screen-quiz").style.display = "block";
+    document.getElementById("q-text").textContent = "Loading questions…";
     await startAttempt(candidateName, day);
     renderQuestion();
     timerInterval = setInterval(tick, 500);

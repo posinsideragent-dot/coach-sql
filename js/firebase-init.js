@@ -9,7 +9,8 @@
 import { initializeApp } from "../vendor/firebase/firebase-app.js";
 import {
   getFirestore, collection, doc, setDoc, updateDoc, onSnapshot,
-  serverTimestamp, arrayUnion, getDoc,
+  serverTimestamp, arrayUnion, getDoc, getDocs, addDoc, deleteDoc,
+  query, where, writeBatch,
 } from "../vendor/firebase/firebase-firestore.js";
 import { firebaseConfig } from "../firebase-config.js";
 
@@ -18,4 +19,5 @@ export const db = getFirestore(app);
 
 export {
   collection, doc, setDoc, updateDoc, onSnapshot, serverTimestamp, arrayUnion, getDoc,
+  getDocs, addDoc, deleteDoc, query, where, writeBatch,
 };

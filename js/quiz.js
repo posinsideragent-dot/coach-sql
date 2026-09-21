@@ -1,7 +1,7 @@
-import { QUESTIONS } from "./questions.js";
 import { startProctoring, requestFullscreen } from "./proctor.js";
 import {
   db, doc, setDoc, updateDoc, arrayUnion, serverTimestamp,
+  collection, query, where, getDocs,
 } from "./firebase-init.js";
 import { QUESTIONS_PER_DAY, TIME_LIMIT_MINUTES, POINTS_PER_QUESTION } from "../firebase-config.js";
 
@@ -25,18 +25,25 @@ function shuffle(arr) {
   return a;
 }
 
-function pickQuestionsForAttempt(day) {
-  const dayIndexes = [];
-  QUESTIONS.forEach((q, idx) => {
-    if (q.day === day) dayIndexes.push(idx);
-  });
-  const picked = shuffle(dayIndexes).slice(0, QUESTIONS_PER_DAY);
+// Questions live in Firestore (collection "questions") so an admin can edit
+// the bank without a code deploy — see the separate admin site. Each
+// attempt fetches that day's full pool fresh, then picks + shuffles
+// client-side, same as when the bank was a static bundled file.
+async function fetchQuestionsForDay(day) {
+  const snap = await getDocs(query(collection(db, "questions"), where("day", "==", day)));
+  const bank = [];
+  snap.forEach((d) => bank.push({ id: d.id, ...d.data() }));
+  return bank;
+}
+
+async function pickQuestionsForAttempt(day) {
+  const bank = await fetchQuestionsForDay(day);
+  const picked = shuffle(bank).slice(0, QUESTIONS_PER_DAY);
   // Also shuffle each question's own option order so the correct letter varies.
-  return shuffle(picked).map((bankIndex) => {
-    const q = QUESTIONS[bankIndex];
+  return picked.map((q) => {
     const order = shuffle([0, 1, 2, 3]);
     return {
-      bankIndex,
+      bankId: q.id,
       day: q.day,
       topic: q.topic,
       question: q.q,
@@ -60,7 +67,7 @@ async function pushFlag(flag) {
 
 export async function startAttempt(name, day) {
   const candidateId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-  const picked = pickQuestionsForAttempt(day);
+  const picked = await pickQuestionsForAttempt(day);
 
   state = {
     candidateId,

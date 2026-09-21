@@ -10,10 +10,17 @@
 <header class="site-header"><img src="assets/brand/sql-logo.png" alt="SQL Account" /></header>
 <div class="wrap">
 
-  <div id="screen-day-pick" class="card">
+  <div id="screen-name" class="card">
     <h1>SQL Account Support</h1>
     <p class="subtitle">Learning</p>
-    <p class="muted">Pick the onboarding topic you want to learn. Each one is a short visual walkthrough, about 20 minutes.</p>
+    <p class="muted">Type your name so your progress shows up for your supervisor, then pick a topic to learn — about 20 minutes each.</p>
+    <input id="name-input" type="text" placeholder="Type your full name" />
+    <button id="start-btn">Continue</button>
+  </div>
+
+  <div id="screen-day-pick" class="card" style="display:none;">
+    <h2>Which topic do you want to learn?</h2>
+    <p class="muted">Each one is a short visual walkthrough, about 20 minutes.</p>
     <div id="day-pick-options"></div>
     <p class="muted" style="margin-top:20px;">Already studied? <a href="test.html">Go straight to testing</a>.</p>
   </div>
@@ -41,12 +48,21 @@
 <script type="module">
   import { renderDayPicker, startLearningModule } from "./js/learning.js";
 
-  renderDayPicker(document.getElementById("day-pick-options"), onDayPicked);
+  let candidateName = "";
+
+  document.getElementById("start-btn").addEventListener("click", () => {
+    const name = document.getElementById("name-input").value.trim();
+    if (!name) { alert("Please type your name first."); return; }
+    candidateName = name;
+    document.getElementById("screen-name").style.display = "none";
+    document.getElementById("screen-day-pick").style.display = "block";
+    renderDayPicker(document.getElementById("day-pick-options"), onDayPicked);
+  });
 
   function onDayPicked(day) {
     document.getElementById("screen-day-pick").style.display = "none";
     document.getElementById("screen-learn").style.display = "block";
-    startLearningModule(day, {
+    startLearningModule(candidateName, day, {
       topic: document.getElementById("learn-topic"),
       timer: document.getElementById("learn-timer"),
       content: document.getElementById("learn-content"),

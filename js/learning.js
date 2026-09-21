@@ -1,6 +1,7 @@
 import { DAY_NAMES } from "./quiz.js";
 import { DEMO_STEPS } from "./demo-steps.js";
 import { LEARNING_MODULE_MINUTES } from "../firebase-config.js";
+import { db, doc, setDoc, updateDoc, serverTimestamp } from "./firebase-init.js";
 
 let timerInterval = null;
 
@@ -91,19 +92,50 @@ function renderCard(container, card) {
   container.appendChild(stepEl);
 }
 
-export function startLearningModule(day, els, onDone) {
+// Live progress reporting to Firestore (learning_sessions) is best-effort —
+// a candidate with no login writes their own session doc, same pattern as
+// the candidates collection. A write failure here must never block or
+// error out the candidate's own learning flow.
+async function pushLearningUpdate(sessionId, fields) {
+  try {
+    await updateDoc(doc(db, "learning_sessions", sessionId), fields);
+  } catch (e) {
+    console.error("learning progress push failed", e);
+  }
+}
+
+export function startLearningModule(name, day, els, onDone) {
   const demo = DEMO_STEPS[day];
   els.topic.textContent = `Day ${day} — ${demo.topic}`;
 
   const sequence = buildSequence(demo);
   let index = 0;
+  const sessionId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
+  setDoc(doc(db, "learning_sessions", sessionId), {
+    name,
+    day,
+    topic: demo.topic,
+    status: "in-progress",
+    currentStepIndex: 0,
+    totalSteps: sequence.length,
+    startedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    completedAt: null,
+  }).catch((e) => console.error("learning session create failed", e));
+
+  let firstRender = true;
   function renderCurrent() {
     renderCard(els.content, sequence[index]);
     els.stepLabel.textContent = `${index + 1} / ${sequence.length}`;
     els.progressFill.style.width = `${(index / (sequence.length - 1)) * 100}%`;
     els.prevBtn.style.visibility = index === 0 ? "hidden" : "visible";
     els.nextBtn.textContent = index === sequence.length - 1 ? "Done" : "Next";
+    // Skip the push on the very first render — the initial setDoc above
+    // already recorded currentStepIndex 0, and pushing here too risks a
+    // race where this update reaches Firestore before that create does.
+    if (firstRender) { firstRender = false; return; }
+    pushLearningUpdate(sessionId, { currentStepIndex: index, updatedAt: serverTimestamp() });
   }
 
   els.prevBtn.onclick = () => {
@@ -114,13 +146,12 @@ export function startLearningModule(day, els, onDone) {
     else finishOnce();
   };
 
-  renderCurrent();
-
   let done = false;
   function finishOnce() {
     if (done) return;
     done = true;
     clearInterval(timerInterval);
+    pushLearningUpdate(sessionId, { status: "completed", completedAt: serverTimestamp() });
     onDone();
   }
 
@@ -134,6 +165,7 @@ export function startLearningModule(day, els, onDone) {
     els.timer.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     if (ms <= 0) finishOnce();
   };
+  renderCurrent();
   tick();
   timerInterval = setInterval(tick, 500);
 }

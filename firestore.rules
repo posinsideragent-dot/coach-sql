@@ -6,19 +6,33 @@ service cloud.firestore {
     // attempt document and update it (this is how a candidate with no login
     // writes their own progress/answers/flags). Anyone can also READ the
     // whole collection, because the admin dashboard needs a live view and
-    // this app has no real authentication layer (same accepted trade-off as
-    // the placeholder admin PIN in firebase-config.js — it's a deterrent,
-    // not real security).
-    //
-    // If you later want this locked down properly, the fix is Firebase
-    // Authentication (e.g. anonymous auth for candidates, email/password or
-    // Google sign-in for the admin) plus rules that check request.auth —
-    // a bigger change than this quiz app currently needs.
+    // candidates themselves have no login. Deletes need real admin sign-in
+    // now that the admin site uses Firebase Authentication.
     match /candidates/{candidateId} {
       allow read: if true;
       allow create: if true;
       allow update: if true;
-      allow delete: if false;
+      allow delete: if request.auth != null;
+    }
+
+    // Learning progress: same shape as candidates — a candidate with no
+    // login writes their own live learning progress, admin dashboard reads
+    // the whole collection, deletes need admin sign-in.
+    match /learning_sessions/{sessionId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if request.auth != null;
+    }
+
+    // Question bank: candidates' browsers need to READ this to build a quiz
+    // attempt, so read stays open (same trade-off as everything else in this
+    // app — no candidate login exists). WRITES are the actual answer key,
+    // though, so only a signed-in admin (via the separate admin site's
+    // Firebase Authentication login) may create/update/delete questions.
+    match /questions/{questionId} {
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }
