@@ -75,7 +75,6 @@
   import { renderDayPicker } from "./js/learning.js";
   import { sendMarkingEmail, computeLevel } from "./js/email-notify.js";
   import { getCandidateProfile, unlockedDaysFromProfile, recordAttemptResult } from "./js/candidate-progress.js";
-  import { maybeSendCompletionReport } from "./js/completion-report.js";
   import { TIME_LIMIT_MINUTES } from "./firebase-config.js";
 
   document.getElementById("rule-time").textContent =
@@ -224,8 +223,8 @@
       banner.innerHTML = `<strong style="color:var(--red);">NOT PASSED</strong> — you can resit Day ${result.day} any time (pass mark: ${passingPercent}%).`;
     }
 
-    if (allPassed && profile) {
-      maybeSendCompletionReport(profile);
+    if (allPassed) {
+      banner.innerHTML += `<br><strong style="color:var(--navy);">All 5 days passed!</strong> Your supervisor will review your results.`;
     }
   }
 </script>
