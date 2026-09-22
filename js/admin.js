@@ -1,7 +1,9 @@
 import { db, collection, onSnapshot } from "./firebase-init.js";
 import { ADMIN_PIN } from "../firebase-config.js";
+import { sendCompletionReport } from "./completion-report.js";
 
 let candidates = {}; // id -> data
+let profiles = {}; // email -> candidate_profiles data
 
 function fmtTime(ts) {
   if (!ts) return "—";
@@ -38,6 +40,60 @@ function renderTable() {
     `;
     tr.style.cursor = "pointer";
     tr.addEventListener("click", () => openDetail(id));
+    tbody.appendChild(tr);
+  });
+}
+
+function renderCompletions() {
+  const tbody = document.getElementById("completions-body");
+  const rows = Object.entries(profiles)
+    .filter(([, p]) => p.allPassed)
+    .sort((a, b) => (a[1].name || "").localeCompare(b[1].name || ""));
+
+  tbody.innerHTML = "";
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="muted">No candidates have passed all 5 days yet.</td></tr>`;
+    return;
+  }
+
+  rows.forEach(([email, p]) => {
+    let totalScore = 0;
+    let totalMax = 0;
+    [1, 2, 3, 4, 5].forEach((d) => {
+      const r = p.perDay?.[d];
+      if (r) { totalScore += r.score; totalMax += r.maxScore; }
+    });
+    const overallPercent = totalMax > 0 ? ((totalScore / totalMax) * 100).toFixed(1) : "—";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.name || "(no name)"}</td>
+      <td>${email}</td>
+      <td>${totalScore} / ${totalMax} (${overallPercent}%)</td>
+      <td class="report-cell"></td>
+    `;
+    const cell = tr.querySelector(".report-cell");
+    if (p.reportSentAt) {
+      cell.textContent = `Sent ${fmtTime(p.reportSentAt)}`;
+    } else {
+      const btn = document.createElement("button");
+      btn.className = "secondary";
+      btn.textContent = "Send completion report";
+      btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        btn.textContent = "Sending…";
+        try {
+          await sendCompletionReport(p);
+          btn.textContent = "Sent";
+        } catch (e) {
+          console.error("completion report failed", e);
+          btn.disabled = false;
+          btn.textContent = "Send completion report";
+          alert(`Failed to send: ${e.message}`);
+        }
+      });
+      cell.appendChild(btn);
+    }
     tbody.appendChild(tr);
   });
 }
@@ -98,6 +154,11 @@ function startLiveListener() {
     candidates = {};
     snap.forEach((d) => { candidates[d.id] = d.data(); });
     renderTable();
+  });
+  onSnapshot(collection(db, "candidate_profiles"), (snap) => {
+    profiles = {};
+    snap.forEach((d) => { profiles[d.id] = d.data(); });
+    renderCompletions();
   });
 }
 
