@@ -37,20 +37,10 @@ export const POINTS_PER_QUESTION = 4; // 20 questions x 4 = 80 points per attemp
 // early if they finish sooner.
 export const LEARNING_MODULE_MINUTES = 20;
 
-// Fill these in after creating a free account at https://www.emailjs.com/ —
-// add an Email Service (e.g. connect Gmail) and an Email Template there, then
-// paste the three IDs it gives you. Used to auto-send a marking-sheet email
-// the moment a candidate finishes. You'll also need to vendor EmailJS's SDK
-// locally (see vendor/emailjs/) — see README for why (same reason as Firebase).
-export const EMAILJS_SERVICE_ID = "service_4pvav1n";
-export const EMAILJS_TEMPLATE_ID = "template_rnd3knr";
-export const EMAILJS_PUBLIC_KEY = "qEx9SNi8cHxY8jjxg";
+// Email sending (marking sheet + completion report) goes through a small
+// Google Apps Script Web App you deploy yourself under your own Gmail
+// account — no third-party email vendor. See mailer/README.md for what it
+// is and step-by-step deploy instructions.
+export const MAILER_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+export const MAILER_SECRET = "PASTE_YOUR_SHARED_SECRET_HERE";
 export const MARKING_EMAIL_TO = "posinsideragent@gmail.com";
-
-// A SECOND EmailJS template, for the one-time "candidate passed all 5 days"
-// completion report. NOT used by this candidate site anymore — sending it
-// is now an admin-approved action (see the separate admin site's
-// js/firebase-config.js, which has its own copy of this same ID plus the
-// EmailJS credentials above). Kept here only as a record of which
-// template ID was created.
-export const EMAILJS_COMPLETION_TEMPLATE_ID = "template_69jr97q";

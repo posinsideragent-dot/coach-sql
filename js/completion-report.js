@@ -1,18 +1,8 @@
 import { db, doc, updateDoc, serverTimestamp } from "./firebase-init.js";
 import { computeLevel } from "./email-notify.js";
 import { DAY_NAMES } from "./quiz.js";
-import {
-  EMAILJS_SERVICE_ID, EMAILJS_COMPLETION_TEMPLATE_ID, EMAILJS_PUBLIC_KEY, MARKING_EMAIL_TO,
-} from "../firebase-config.js";
-
-let initialized = false;
-function ensureInit() {
-  if (initialized) return;
-  if (window.emailjs && typeof window.emailjs.init === "function") {
-    window.emailjs.init(EMAILJS_PUBLIC_KEY);
-    initialized = true;
-  }
-}
+import { MAILER_URL, MAILER_SECRET, MARKING_EMAIL_TO } from "../firebase-config.js";
+import { sendMail } from "./mailer.js";
 
 // Triggered by an admin from the dashboard (not automatically) once a
 // candidate has passed all 5 days. Guards against double-sending via
@@ -29,38 +19,29 @@ export async function sendCompletionReport(profile) {
     throw new Error("Completion report was already sent for this candidate.");
   }
 
-  ensureInit();
-  if (!window.emailjs) {
-    throw new Error("EmailJS SDK not loaded — see vendor/emailjs/README.md.");
-  }
-  if (!EMAILJS_COMPLETION_TEMPLATE_ID) {
-    throw new Error("EMAILJS_COMPLETION_TEMPLATE_ID is not set in firebase-config.js.");
-  }
-
   let totalScore = 0;
   let totalMax = 0;
-  const dayFields = {};
-  [1, 2, 3, 4, 5].forEach((d) => {
+  const dayLines = [1, 2, 3, 4, 5].map((d) => {
     const r = profile.perDay[d];
     totalScore += r.score;
     totalMax += r.maxScore;
-    dayFields[`day${d}_topic`] = DAY_NAMES[d];
-    dayFields[`day${d}_score`] = `${r.score} / ${r.maxScore} (${r.percent.toFixed(0)}%)`;
-    dayFields[`day${d}_level`] = r.level;
+    return `Day ${d} — ${DAY_NAMES[d]}: ${r.score} / ${r.maxScore} (${r.percent.toFixed(0)}%) — ${r.level}`;
   });
   const overallLevel = computeLevel(totalScore, totalMax);
   const overallPercent = totalMax > 0 ? (totalScore / totalMax) * 100 : 0;
 
-  await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_COMPLETION_TEMPLATE_ID, {
-    to_email: MARKING_EMAIL_TO,
-    candidate_name: profile.name,
-    candidate_email: profile.email,
-    ...dayFields,
-    overall_score: `${totalScore} / ${totalMax} (${overallPercent.toFixed(1)}%)`,
-    overall_level: overallLevel,
-    ready_to_work: "YES",
-    completed_at: new Date().toLocaleString(),
-  });
+  const subject = `[SQL Account] ${profile.name} — Completion report (all 5 days passed)`;
+  const body = [
+    `Candidate: ${profile.name} <${profile.email}>`,
+    "",
+    ...dayLines,
+    "",
+    `Overall: ${totalScore} / ${totalMax} (${overallPercent.toFixed(1)}%) — ${overallLevel}`,
+    `Ready to start work: YES`,
+    `Completed: ${new Date().toLocaleString()}`,
+  ].join("\n");
+
+  await sendMail(MAILER_URL, MAILER_SECRET, { to: MARKING_EMAIL_TO, subject, body });
 
   await updateDoc(doc(db, "candidate_profiles", profile.email), {
     reportSentAt: serverTimestamp(),
