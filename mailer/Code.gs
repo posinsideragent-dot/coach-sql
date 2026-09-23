@@ -32,6 +32,7 @@ function doPost(e) {
     var to = String(data.to || "").trim();
     var subject = String(data.subject || "").trim();
     var body = String(data.body || "").trim();
+    var html = String(data.html || "").trim();
 
     if (!to || !subject || !body) {
       return json({ ok: false, error: "Missing to/subject/body" });
@@ -40,7 +41,11 @@ function doPost(e) {
       return json({ ok: false, error: "Recipient not allowed" });
     }
 
-    GmailApp.sendEmail(to, subject, body);
+    // "body" is always sent as the plain-text part (accessibility + clients
+    // that don't render HTML); "html", if provided, is layered on top as the
+    // styled version most inboxes actually display.
+    var options = html ? { htmlBody: html } : {};
+    GmailApp.sendEmail(to, subject, body, options);
     return json({ ok: true });
   } catch (err) {
     return json({ ok: false, error: String(err) });
